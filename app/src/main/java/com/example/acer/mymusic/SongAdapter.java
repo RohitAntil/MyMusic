@@ -39,8 +39,7 @@ import android.widget.TextView;
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             // TODO Auto-generated method stub
-            LinearLayout songLay = (LinearLayout)songInf.inflate
-                    (R.layout.song, parent, false);
+            LinearLayout songLay = (LinearLayout)songInf.inflate(R.layout.song, parent, false);
             //get title and artist views
             TextView songView = (TextView)songLay.findViewById(R.id.song_title);
             TextView artistView = (TextView)songLay.findViewById(R.id.song_artist);

@@ -10,7 +10,8 @@
         android:id="@+id/song_list"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="#c6ff1c">
+        android:background="#fffff8"
+        android:divider="#f6ffff">
     </ListView>
 
 </LinearLayout>
