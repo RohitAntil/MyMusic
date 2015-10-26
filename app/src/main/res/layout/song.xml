@@ -3,11 +3,19 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:onClick="songPicked"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:padding="5dp"
-    android:background="@android:drawable/title_bar"
+    android:background="#fefffd"
     android:baselineAligned="false">
 
+    <ImageView
+        android:id="@+id/musicimg"
+        android:layout_width="89dp"
+        android:layout_height="fill_parent"
+        android:background="@drawable/music_img1"></ImageView>
+    <LinearLayout android:orientation= "vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
     <TextView
         android:id="@+id/song_title"
         android:layout_width="fill_parent"
@@ -22,5 +30,5 @@
         android:layout_height="wrap_content"
         android:textColor="#040404"
         android:textSize="18sp" />
-
+</LinearLayout>
 </LinearLayout>
