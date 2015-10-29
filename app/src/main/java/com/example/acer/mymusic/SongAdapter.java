@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 /**
@@ -43,11 +44,15 @@ import android.widget.TextView;
             //get title and artist views
             TextView songView = (TextView)songLay.findViewById(R.id.song_title);
             TextView artistView = (TextView)songLay.findViewById(R.id.song_artist);
+            ImageView coverView = (ImageView)songLay.findViewById(R.id.musicimg);
             //get song using position
             Song currSong = songs.get(position);
             //get title and artist strings
             songView.setText(currSong.getTitle());
             artistView.setText(currSong.getArtist());
+            if(currSong.getCoverArt()!=null) {
+                coverView.setImageBitmap(currSong.getCoverArt());
+            }
             //set position as tag
             songLay.setTag(position);
             return songLay;

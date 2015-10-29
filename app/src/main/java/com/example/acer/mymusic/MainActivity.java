@@ -1,14 +1,21 @@
 package com.example.acer.mymusic;
 
 import android.content.ComponentName;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.IBinder;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -26,6 +33,8 @@ public class MainActivity extends AppCompatActivity implements MediaController.M
     private Intent playIntent;
     private boolean musicBound=false;
     private MusicController controller;
+    private boolean paused=false, playbackPaused=false;
+
     private void setController(){
         //set the controller up
         controller = new MusicController(this);
@@ -55,6 +64,8 @@ public class MainActivity extends AppCompatActivity implements MediaController.M
 
     @Override
     public void pause() {
+
+        playbackPaused=true;
         musicSrv.pausePlayer();
     }
 
@@ -127,12 +138,20 @@ public class MainActivity extends AppCompatActivity implements MediaController.M
     }
     private void playNext(){
         musicSrv.playNext();
+        if(playbackPaused){
+            setController();
+            playbackPaused=false;
+        }
         controller.show(0);
     }
 
     //play previous
     private void playPrev(){
         musicSrv.playPrev();
+        if(playbackPaused){
+            setController();
+            playbackPaused=false;
+        }
         controller.show(0);
     }
     private ServiceConnection musicConnection = new ServiceConnection(){
@@ -163,6 +182,23 @@ public class MainActivity extends AppCompatActivity implements MediaController.M
         }
     }
     @Override
+    protected void onPause(){
+        super.onPause();
+        paused=true;
+    }
+    @Override
+    protected void onResume(){
+        super.onResume();
+        if(paused){
+            setController();
+            paused=false;
+        }
+    }
+    protected void onStop() {
+        controller.hide();
+        super.onStop();
+    }
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -174,6 +210,7 @@ public class MainActivity extends AppCompatActivity implements MediaController.M
         switch (item.getItemId()) {
             case R.id.action_shuffle:
                 //shuffle
+                musicSrv.setShuffle();
                 break;
             case R.id.action_end:
                 stopService(playIntent);
@@ -189,9 +226,14 @@ public class MainActivity extends AppCompatActivity implements MediaController.M
         musicSrv=null;
         super.onDestroy();
     }
-    public void songPicked(View view){
+    public void songPicked(View view) {
         musicSrv.setSong(Integer.parseInt(view.getTag().toString()));
         musicSrv.playSong();
+        if(playbackPaused){
+            setController();
+            playbackPaused=false;
+        }
+        controller.show(0);
     }
     public void getSongList() {
         //retrieve song info
@@ -207,13 +249,25 @@ public class MainActivity extends AppCompatActivity implements MediaController.M
                     (android.provider.MediaStore.Audio.Media._ID);
             int artistColumn = musicCursor.getColumnIndex
                     (android.provider.MediaStore.Audio.Media.ARTIST);
+            int albumIDColumn=musicCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
             //add songs to list
             do {
                 long thisId = musicCursor.getLong(idColumn);
                 String thisTitle = musicCursor.getString(titleColumn);
                 String thisArtist = musicCursor.getString(artistColumn);
-
-                songList.add(new Song(thisId, thisTitle, thisArtist));
+                Long thisAlbumId = musicCursor.getLong(albumIDColumn);
+                Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
+                Uri uri = ContentUris.withAppendedId(sArtworkUri, thisAlbumId);
+                ContentResolver res = getContentResolver();
+                InputStream in=null;
+                try {
+                   in = res.openInputStream(uri);
+                }catch(Exception e)
+                {
+                    e.printStackTrace();
+                }
+                Bitmap artwork = BitmapFactory.decodeStream(in);
+                songList.add(new Song(thisId, thisTitle, thisArtist,artwork));
             }
             while (musicCursor.moveToNext());
         }
