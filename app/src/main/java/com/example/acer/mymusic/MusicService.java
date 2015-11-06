@@ -54,6 +54,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         player.setOnCompletionListener(this);
         player.setOnErrorListener(this);
     }
+
     public void setShuffle(){
         if(shuffle) shuffle=false;
         else shuffle=true;

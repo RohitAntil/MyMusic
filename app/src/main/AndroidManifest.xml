@@ -29,6 +29,11 @@
             android:enabled="true"
             android:exported="true" >
         </service>
+
+        <activity
+            android:name=".PlaySongActivity"
+            android:label="@string/title_activity_play_song" >
+        </activity>
     </application>
 
 </manifest>
